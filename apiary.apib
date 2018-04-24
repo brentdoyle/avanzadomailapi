@@ -1,0 +1,286 @@
+FORMAT: 1A
+HOST: http://mail.avanzadollc.com/
+
+# Avanzado Mail API Documentation
+Avanzado powers multi-channel marketing. The Avanzado REST API allows you to:
+
+* Send direct mail to specific EDDM routes
+* Get USPS EDDM carrier routes for an address
+
+
+# Authentication
+All requests to Avanzado's REST API require you to authenticate. We support two forms of authentication:
+
+1) Your AccountSid and AuthToken are the "master keys" to your account. To authenticate using these "master keys",
+use HTTP basic auth with the username set to your AccountSid and the password set to your AuthToken.
+Your AccountSid and AuthToken can be found on your Account Dashboard.
+
+2) (Coming soon) API Keys are credentials you can create and revoke on the website in yuor Account Dashboard 
+(using your "master key" AccountSid and AuthToken). To authenticate using an API Key, use HTTP basic auth with 
+the username set to the API Key's Sid and the password set to the API Key's Secret.
+
+Both authentication methods use HTTP basic auth because it is well supported. 
+Most HTTP clients (including web-browsers) present a dialog or prompt for you to provide a username and password 
+for HTTP basic auth. Most clients will also allow you to provide credentials in the URL.
+
+
+# Response Codes
+Possible GET Response Status Codes
+
+* 200 OK: The request was successful and the response body contains the representation requested.
+* 302 FOUND: A common redirect response; you can GET the representation at the URI in the Location response header.
+* 304 NOT MODIFIED: Your client's cached version of the representation is still up to date.
+* 401 UNAUTHORIZED: The supplied credentials, if any, are not sufficient to access the resource.
+* 404 NOT FOUND: Resource was not found or does not exist.
+* 429 TOO MANY REQUESTS: Your application is sending too many simultaneous requests.
+* 500 SERVER ERROR: We couldn't return the representation due to an internal server error.
+* 503 SERVICE UNAVAILABLE: We are temporarily unable to return the representation. Please wait for a bit and try again.
+
+# Custom Field Data Types
+**Integer/Number**
+
+Must be whole digits: e.g.
+`"integer--Smog-Level": 4`
+
+They can also be specified as strings as long as there is nothing other than the number in the field, e.g.
+`"integer--Smog--Level": "Monkey" --- this would cause an error`
+`"integer--Smog--Level": "2567" --- this is fine`
+`"integer--Smog--Level": "$2567" --- this would cause an error`
+
+Note that passing through null is also acceptable for any kind of field, including numbers. 
+This means the field would be considered "blank".
+
+**Floats/Number**
+
+Floats with decimal must be a valid number: e.g.
+`"float--Smog--Level": 4.01`
+
+They can also be specified as strings as long as there is nothing other than the number in the field, e.g.
+`"integer--Smog--Level": "Monkey" --- this would cause an error`
+`"integer--Smog--Level": "2567.58" --- this is fine`
+`"integer--Smog--Level": "2567" --- this is also fine`
+
+Note that passing through null is also acceptable for any kind of field, including floats. This means the field 
+would be considered "blank".
+
+**Strings**
+
+Strings are pretty straight-forward: e.g. 
+`"string--My--String": "Hello how are you going"`
+
+We accept any valid UTF-8 string.
+
+**Dates**
+
+Please see the next section of this document for a full description of dates.
+
+# Date Formats
+We accepts dates in the ISO8601 format. Here is a description of the format for dates as 
+used in the API taken directly from the standard:
+
+
+The formats are as follows. 
+
+Exactly the components shown here must be present, with exactly this punctuation. 
+Note that the "T" appears literally in the string, to indicate the beginning of the time element, 
+as specified in ISO 8601.
+
+
+`Complete date: YYYY-MM-DD (eg 2018-07-16)`
+
+`Complete date plus hours and minutes: YYYY-MM-DDThh:mmTZD (eg 2018-07-16T19:20+01:00)`
+
+`Complete date plus hours, minutes and seconds: YYYY-MM-DDThh:mm:ssTZD (eg 2018-07-16T19:20:30+01:00)`
+
+`Complete date plus hours, minutes, seconds and a decimal fraction of a second YYYY-MM-DDThh:mm:ss.sTZD (eg 2018-07-16T19:20:30.45+01:00)`
+
+Where:
+
+* YYYY = four-digit year
+* MM   = two-digit month (01=January, etc.)
+* DD   = two-digit day of month (01 through 31)
+* hh   = two digits of hour (00 through 23) (am/pm NOT allowed)
+* mm   = two digits of minute (00 through 59)
+* ss   = two digits of second (00 through 59)
+* s    = one or more digits representing a decimal fraction of a second
+* TZD  = time zone designator (Z or +hh:mm or -hh:mm)
+     
+There are two ways of handling time zone offsets:
+
+Times are expressed in UTC (Coordinated Universal Time), with a special UTC designator ("Z"). 
+Times are expressed in local time, together with a time zone offset in hours and minutes. 
+A time zone offset of "+hh:mm" indicates that the date/time uses a local time zone which 
+is "hh" hours and "mm" minutes ahead of UTC. A time zone offset of "-hh:mm" indicates that 
+the date/time uses a local time zone which is "hh" hours and "mm" minutes behind UTC.
+
+
+Examples of valid dates are:
+
+`"Birthday": "2018-12-01"`
+
+`"Appointment": "2018-10-10T13:50:00Z"`
+
+
+We also accept dates in simple American format such as:
+
+`"SomeDate":"12/30/2018"`
+
+
+## Group EDDM Routes
+Group of all route-related resources.
+
+## EDDM Routes [/v1/routes/{route_id}]
+
+The EDDM Route object.
+
++ Model (application/json)
+
+    + Body
+    
+            {
+                "id":"12345678901234567",
+                "proximity":"exact",
+                "usps_route":"55555R001",
+                "residential_count":637,
+                "business_count":2,
+                "total_count":639,
+                "age":"49% aged 25-64",
+                "household_income":"83158",
+                "household_size":2.9,
+                "zip_code":"55555"
+            }
+
+### Retrieve a single EDDM route [GET /v1/routes/{route_id}]
+
++ Parameters
+    + route_id: 1 (required, string) - ID of the route in form of a string
+    
++ Response 200
+
+    [EDDM Routes][]
+
++ Response 404 (application/json)
+
+        { 
+            "error": "Resource not found" 
+        }
+        
+
+## EDDM Routes Collection [/v1/routes]
+
+Get a list of all EDDM routes near a mailing address.
+
++ Model (application/json)
+
+    + Body
+    
+                    {
+                        "routes":
+                        [
+                            {
+                                "id":"12345678901234567",
+                                "proximity":"exact",
+                                "usps_route":"55555R001",
+                                "residential_count":637,
+                                "business_count":2,
+                                "total_count":639,
+                                "age":"49% aged 25-64",
+                                "household_income":"83158",
+                                "household_size":2.9,
+                                "zip_code":"55555"
+                            },
+                            {
+                                "id":"23456789012345678",
+                                "proximity":"near",
+                                "usps_route":"55555R002",
+                                "residential_count":597,
+                                "business_count":3,
+                                "total_count":600,
+                                "age":"44% aged 25-64",
+                                "household_income":"56231",
+                                "household_size":3.2,
+                                "zip_code":"55555"
+                            }
+                        ],
+                        "paging": {
+                            "total": 2,
+                            "page": 1,
+                            "pages": 1
+                        }
+                    }
+
+### List all EDDM routes [GET /v1/routes]
+
++ Request (application/json)
+
+        {
+            "address_1": "12345 Main St",
+            "city": "Amarillo",
+            "state": "TX",
+            "zip_code": "55555",
+            "country": "United States"
+        }
+
++ Response 200
+
+    [EDDM Routes Collection][]
+    
+    
++ Response 404 (application/json)
+
+        { 
+            "error": "Resource not found" 
+        }
+    
+
+
+## Group Mail
+Group of all mail-related resources.
+
+### Send direct mail [POST /v1/mail/send]
+
++ Request (application/json)
+
+        {
+            "template_id": "0000-1234-5678-9012",
+            "to": "eddm|list",
+            "eddm": [
+                { "usps_route": "55555R001" },
+                { "usps_route": "55555R002" }
+            ],
+            "list": "{path}",
+            "scheduled_date": "2018-05-01T14:38:16+00:00",
+            "template_content": {
+                "images": [
+                    { "image": "{path}" },
+                    { "image": "{path}" },
+                    { "image": "{path}" },
+                    { "image": "{path}" },
+                    { "image": "{path}" },
+                    { "image": "{path}" }
+                ],
+                "text": [
+                    { "text": "{office name}" },                
+                    { "text": "{office address}" },
+                    { "text": "{website}" },
+                    { "text": "{agent name}" }  
+                    { "text": "{agent email}" },
+                    { "text": "{agent phone}" }
+                ]
+            }
+        }
+
++ Response 200
+
+            {
+                "confirmation_number": "000000987654321",
+                "scheduled_date": "2018-05-01T14:38:16+00:00"
+            }
+
+    
+    
++ Response 404 (application/json)
+
+        { 
+            "error": "Resource not found" 
+        }
