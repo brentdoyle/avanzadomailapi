@@ -138,16 +138,16 @@ The EDDM Route object.
     + Body
     
             {
-                "id":"12345678901234567",
-                "proximity":"exact",
-                "usps_route":"55555R001",
-                "residential_count":637,
-                "business_count":2,
-                "total_count":639,
-                "age":"49% aged 25-64",
-                "household_income":"83158",
-                "household_size":2.9,
-                "zip_code":"55555"
+                "id": "12345678901234567",
+                "proximity": "exact",
+                "usps_route": "55555R001",
+                "residential_count": 637,
+                "business_count": 2,
+                "total_count": 639,
+                "age": "49% aged 25-64",
+                "household_income": 83158,
+                "household_size": 2.9,
+                "zip_code": "55555"
             }
 
 ### Retrieve a single EDDM route [GET /v1/routes/{route_id}]
@@ -178,28 +178,28 @@ Get a list of all EDDM routes near a mailing address.
                         "routes":
                         [
                             {
-                                "id":"12345678901234567",
-                                "proximity":"exact",
-                                "usps_route":"55555R001",
-                                "residential_count":637,
-                                "business_count":2,
-                                "total_count":639,
-                                "age":"49% aged 25-64",
-                                "household_income":"83158",
-                                "household_size":2.9,
-                                "zip_code":"55555"
+                                "id": "12345678901234567",
+                                "proximity": "exact",
+                                "usps_route": "55555R001",
+                                "residential_count": 637,
+                                "business_count": 2,
+                                "total_count": 639,
+                                "age": "49% aged 25-64",
+                                "household_income": 83158,
+                                "household_size": 2.9,
+                                "zip_code": "55555"
                             },
                             {
-                                "id":"23456789012345678",
-                                "proximity":"near",
-                                "usps_route":"55555R002",
-                                "residential_count":597,
-                                "business_count":3,
-                                "total_count":600,
-                                "age":"44% aged 25-64",
-                                "household_income":"56231",
-                                "household_size":3.2,
-                                "zip_code":"55555"
+                                "id": "23456789012345678",
+                                "proximity": "near",
+                                "usps_route": "55555R002",
+                                "residential_count": 597,
+                                "business_count": 3,
+                                "total_count": 600,
+                                "age": "44% aged 25-64",
+                                "household_income": 56231,
+                                "household_size": 3.2,
+                                "zip_code": "55555"
                             }
                         ],
                         "paging": {
@@ -243,13 +243,13 @@ Group of all mail-related resources.
 
         {
             "template_id": "0000-1234-5678-9012",
-            "to": "{eddm|list}",
+            "to": "{eddm | list}",
             "eddm": [
                 { "usps_route": "55555R001" },
                 { "usps_route": "55555R002" }
             ],
-            "list": "{http://url|json objects}",
-            "scheduled_date": "2018-05-01T14:38:16+00:00",
+            "list": "{http://url | json objects}",
+            "scheduled_date": "2018-05-01",
             "template_content": {
                 "images": [
                     { 
@@ -310,7 +310,7 @@ Group of all mail-related resources.
 
             {
                 "confirmation_number": "000000987654321",
-                "scheduled_date": "2018-05-01T14:38:16+00:00"
+                "scheduled_date": "2018-05-01"
             }
 
     
