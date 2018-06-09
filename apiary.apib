@@ -129,7 +129,7 @@ We also accept dates in simple American format such as:
 ## Group EDDM Routes
 Group of all route-related resources.
 
-## EDDM Routes [/v1/routes/{route_id}]
+## EDDM Routes [/v1/routes/{usps_route}]
 
 The EDDM Route object.
 
@@ -140,21 +140,37 @@ The EDDM Route object.
             {
                 "id": "12345678901234567",
                 "proximity": "exact",
-                "usps_route": "55555R001",
-                "residential_count": 637,
-                "business_count": 2,
-                "total_count": 639,
-                "age": "49% aged 25-64",
-                "household_income": 83158,
-                "household_size": 2.9,
-                "zip_code": "55555"
+                "carrier_route": "55555R001",
+                "zip_code": "55555",
+                "counts": {
+                    "route_total": 655,
+                    "business_total": 5
+                    "residential_total": 650,
+                    "residential_counts": {
+                        "single_family": 630,
+                        "multi_family": 20
+                    }
+                },
+                "geocode": {
+                    "latitude": 00.000000,
+                    "longitude": 00.000000
+                },
+                "household_data": {
+                    "household_income": 83158,
+                    "household_size": 2.9
+                }
             }
 
-### Retrieve a single EDDM route [GET /v1/routes/{route_id}]
+### Retrieve a single EDDM route [GET /v1/routes/{usps_route}]
 
 + Parameters
-    + route_id: 1 (required, string) - ID of the route in form of a string
-    
+    + usps_route: 55555R001 (required, string) - USPS route number in form of a string
+
++ Request
+    + Headers
+
+            Authorization: Basic ABC123
+          
 + Response 200
 
     [EDDM Routes][]
@@ -165,7 +181,6 @@ The EDDM Route object.
             "error": "Resource not found" 
         }
         
-
 ## EDDM Routes Collection [/v1/routes]
 
 Get a list of all EDDM routes near a mailing address.
@@ -173,53 +188,83 @@ Get a list of all EDDM routes near a mailing address.
 + Model (application/json)
 
     + Body
-    
-                    {
-                        "routes":
-                        [
-                            {
-                                "id": "12345678901234567",
-                                "proximity": "exact",
-                                "usps_route": "55555R001",
-                                "residential_count": 637,
-                                "business_count": 2,
-                                "total_count": 639,
-                                "age": "49% aged 25-64",
-                                "household_income": 83158,
-                                "household_size": 2.9,
-                                "zip_code": "55555"
-                            },
-                            {
-                                "id": "23456789012345678",
-                                "proximity": "near",
-                                "usps_route": "55555R002",
-                                "residential_count": 597,
-                                "business_count": 3,
-                                "total_count": 600,
-                                "age": "44% aged 25-64",
-                                "household_income": 56231,
-                                "household_size": 3.2,
-                                "zip_code": "55555"
-                            }
-                        ],
-                        "paging": {
-                            "total": 2,
-                            "page": 1,
-                            "pages": 1
-                        }
-                    }
 
-### List all EDDM routes [GET /v1/routes]
+                {
+                    "routes": [
+                        {
+                            "id": "12345678901234567",
+                            "proximity": "exact",
+                            "carrier_route": "55555R001",
+                            "zip_code": "55555",
+                            "counts": {
+                                "route_total": 655,
+                                "business_total": 5
+                                "residential_total": 650,
+                                "residential_counts": {
+                                    "single_family": 630,
+                                    "multi_family": 20
+                                }
+                            },
+                            "geocode": {
+                                "latitude": 00.000000,
+                                "longitude": 00.000000
+                            },
+                            "household_data": {
+                                "household_income": 83158,
+                                "household_size": 2.9
+                            }
+                        },
+                        {
+                            "id": "23456789012345678",
+                            "proximity": "exact",
+                            "carrier_route": "R002",
+                            "zip_code": "55555",
+                            "counts": {
+                                "route_total": 530,
+                                "business_total": 10
+                                "residential_total": 520,
+                                "residential_counts": {
+                                    "single_family": 510,
+                                    "multi_family": 10
+                                }
+                            },
+                            "geocode": {
+                                "latitude": 00.000000,
+                                "longitude": 00.000000
+                            },
+                            "household_data": {
+                                "household_income": 67032,
+                                "household_size": 3.1
+                            }
+                        }
+                    ],
+                    "paging": {
+                        "total": 2,
+                        "page": 1,
+                        "pages": 1
+                    }
+                }
+
+### Return EDDM routes [POST /v1/routes]
+
+NOTE: we removed the GET option as a way to retrieve EDDM routes. POST is the supported method, (June 9 2018)
+You must pass a mailing address utilizing request object parameters.
 
 + Request (application/json)
 
-        {
-            "address_1": "12345 Main St",
-            "city": "Amarillo",
-            "state": "TX",
-            "zip_code": "55555",
-            "country": "United States"
-        }
+    + Headers
+    
+            Authorization: Basic ABC123
+            
+    + Body 
+            
+                    {
+                        "address1": "1234 Main St",
+                        "city": "Miami",
+                        "state": FL,
+                        "zip": 33101,
+                        "country": "USA"
+                    }
 
 + Response 200
 
@@ -234,87 +279,127 @@ Get a list of all EDDM routes near a mailing address.
     
 
 
-## Group Mail
-Group of all mail-related resources.
+## Group Postcards
+Group of all postcard-related resources.
 
-### Send direct mail [POST /v1/mail/send]
+### Proof status of a postcard [POST /v1/postcards/{job_number}/proof]
+
++ Parameters
+    + job_number: 000000987654321 (required, string) - Avanzado job number in form of a string
+
 
 + Request (application/json)
+    + Headers
+    
+            Authorization: Basic ABC123
+            
+    + Body 
 
-        {
-            "template_id": "0000-1234-5678-9012",
-            "to": "{eddm | list}",
-            "eddm": [
-                { "usps_route": "55555R001" },
-                { "usps_route": "55555R002" }
-            ],
-            "list": "{http://url | json objects}",
-            "scheduled_date": "2018-05-01",
-            "template_content": {
-                "images": [
-                    { 
-                        "image": "{http://url}",
-                        "code": "position1"
-                    },
-                    { 
-                        "image": "{http://url}",
-                        "code": "position2"
-                    },
-                    { 
-                        "image": "{http://url}",
-                        "code": "position3"
-                    },
-                    { 
-                        "image": "{http://url}",
-                        "code": "position4"
-                    }                    
-                ],
-                "text": [
-                    { 
-                        "text": "{property address}",
-                        "code": "position5"
-                    },
-                    { 
-                        "text": "{list price}",
-                        "code": "position6"
-                    },                    
-                    { 
-                        "text": "{office name}",
-                        "code": "position7"
-                    },                
-                    { 
-                        "text": "{office address}",
-                        "code": "position8"
-                    },
-                    { 
-                        "text": "{website}",
-                        "code": "position9"
-                    },
-                    { 
-                        "text": "{agent name}",
-                        "code": "position10"
-                    }  
-                    { 
-                        "text": "{agent email}",
-                        "code": "position11"
-                    },
-                    { 
-                        "text": "{agent phone}",
-                        "code": "position12"
-                    }
-                ]
+            {
+                "proof_status": "approve|reject"
             }
-        }
 
 + Response 200
 
             {
+                "job_number": "000000987654321",
                 "confirmation_number": "000000987654321",
-                "scheduled_date": "2018-05-01"
+                "expected_delivery_date": "2018-05-27T00:00:00.000Z",
+                "proof_url": "tbd",
             }
 
     
     
++ Response 404 (application/json)
+
+        { 
+            "error": "Resource not found" 
+        }
+        
+### Create a postcard [POST /v1/postcards/send]
+
+The expected_send_date is a timestamp in ISO 8601 format which specifies a date after 
+the current time and up to 45 days (TBD) in the future to send the postcard.
+
+The merge_variables object can gave up to 40 key-value pairs. 
+Keys must be at most 40 characters and values must be at most 500 characters.
+Neither can contain the characters " and \. Nested objects are not supported.
+
++ Request (application/json)
+    + Headers
+    
+            Authorization: Basic ABC123
+            
+    + Body 
+    
+                {
+                    "template_id": "0000-1234-5678-9012",
+                    "description": "optional mailing name"
+                    "proof": {
+                        "required": true,
+                        "proof_email": "you@email.com"           
+                    },
+                    "to": {
+                        "eddm": [
+                            { "carrier_route": "55555R001" },
+                            { "carrier_route": "55555R002" }
+                        ],
+                        "list": "{http://url}",
+                        "recipients": [
+                            {
+                                "name": "Joe Smiley",
+                                "company": null,
+                                "address_line1": "567 Maple Dr",
+                                "address_line2": "Ste 3",
+                                "address_city": "Austin",
+                                "address_state": "TX",
+                                "address_zip": "78746-1741",
+                                "address_country": "US"
+                            }
+                        ]
+                    },                    
+                    "from": {
+                        "name": "Mary Smith",
+                        "company": "The Heyl Group at Keller Williams"|null,
+                        "address_line1": "1801 S. Mo-Pac Expressway",
+                        "address_line2": "",
+                        "address_city": "Austin",
+                        "address_state": "TX",
+                        "address_zip": "78746-1741",
+                        "address_country": "US"
+                    },                    
+                    "expected_send_date": "2018-09-12 | 2018-09-12T00:00:00.967Z",
+                    "mail_type": "first_class | standard",
+                    "merge_variables": [
+                        { 
+                            "name": "agent_name",
+                            "value": "Mary Smith"
+                        },
+                        { 
+                            "name": "agent_office_name",
+                            "value": "The Heyl Group at Keller Williams"
+                        },
+                        { 
+                            "name": "agent_office_address",
+                            "value": "1801 S. Mo-Pac Expressway, Ste 100, Austin, TX 78746"
+                        },
+                        {
+                            "name": "agent_photo",
+                            "value": "{http://url}"
+                        }
+                    },
+                    "date_created": "2018-09-05T12:34:00.967Z",
+                    "date_modified": "2018-09-05T12:34:00.967Z"
+                }
+
+
++ Response 200
+
+            {
+                "job_number": "000000987654321"
+            }
+
+
 + Response 404 (application/json)
 
         { 
