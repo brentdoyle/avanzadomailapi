@@ -129,7 +129,7 @@ We also accept dates in simple American format such as:
 ## Group EDDM Routes
 Group of all route-related resources.
 
-## EDDM Routes [/v1/routes/{usps_route}]
+## EDDM Routes [/v1/routes/{carrier_route}]
 
 The EDDM Route object.
 
@@ -161,10 +161,10 @@ The EDDM Route object.
                 }
             }
 
-### Retrieve a single EDDM route [GET /v1/routes/{usps_route}]
+### Retrieve a single EDDM route [GET /v1/routes/{carrier_route}]
 
 + Parameters
-    + usps_route: 55555R001 (required, string) - USPS route number in form of a string
+    + carrier_route: 55555R001 (required, string) - USPS route number in form of a string
 
 + Request
     + Headers
@@ -245,26 +245,21 @@ Get a list of all EDDM routes near a mailing address.
                     }
                 }
 
-### Return EDDM routes [POST /v1/routes]
-
-NOTE: we removed the GET option as a way to retrieve EDDM routes. POST is the supported method, (June 9 2018)
-You must pass a mailing address utilizing request object parameters.
+### Retrieve EDDM routes using an address [GET /v1/routes?address={address}&city={city}&state={state}&zip={zip}&country={country}]
 
 + Request (application/json)
 
     + Headers
     
             Authorization: Basic ABC123
-            
-    + Body 
-            
-                    {
-                        "address1": "1234 Main St",
-                        "city": "Miami",
-                        "state": FL,
-                        "zip": 33101,
-                        "country": "USA"
-                    }
+
+    + Parameters
+    
+        + address (string, required) - The household address. Default: 20
+        + city (string, required) - The household city. Default: 20
+        + state (string, required) - The household state. Default: 20
+        + zip (string, required) - The household zip. Default: 20
+        + country (string, required) - The household address country. Default: US
 
 + Response 200
 
@@ -282,7 +277,7 @@ You must pass a mailing address utilizing request object parameters.
 ## Group Postcards
 Group of all postcard-related resources.
 
-### Proof status of a postcard [POST /v1/postcards/{job_number}/proof]
+### Assign proof status of a postcard [POST /v1/postcards/{job_number}/proof]
 
 + Parameters
     + job_number: 000000987654321 (required, string) - Avanzado job number in form of a string
