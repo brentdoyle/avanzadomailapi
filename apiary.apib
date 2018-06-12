@@ -126,6 +126,7 @@ We also accept dates in simple American format such as:
 `"SomeDate":"12/30/2018"`
 
 
+
 ## Group Routes
 Group of all EDDM carrier route-related resources.
 
@@ -280,7 +281,8 @@ The EDDM Route object.
                         ]
                     },
                     "proximity": {
-                    
+                        "miles": 0,
+                        "label": "exact"
                     },
                     "household_data": {
                         "household_income": "81246",
@@ -320,7 +322,10 @@ Get a list of all EDDM routes near a mailing address.
                     "routes": [
                         {
                             "id": "12345678901234567",
-                            "proximity": "exact",
+                            "proximity": {
+                                "miles": 0,
+                                "label": "exact"
+                            },
                             "carrier_route": "55555R001",
                             "zip_code": "55555",
                             "counts": {
@@ -343,7 +348,10 @@ Get a list of all EDDM routes near a mailing address.
                         },
                         {
                             "id": "23456789012345678",
-                            "proximity": "exact",
+                            "proximity": {
+                                "miles": 0,
+                                "label": "exact"
+                            },
                             "carrier_route": "R002",
                             "zip_code": "55555",
                             "counts": {
@@ -522,14 +530,12 @@ The Order object.
             "error": "Resource modification failed"
         }
 
-### Create an order for a postcard mailing [POST /v1/orders/postcards/]
+### Update an order item (ex. proof status) [PATCH /v1/orders/{order_number}/items/{item_id}]
 
-The expected_send_date is a timestamp in ISO 8601 format which specifies a date after 
-the current time and up to 45 days (TBD) in the future to send the postcard.
++ Parameters
+    + order_number: 000000987654321 (required, string) - order number in form of a string
+    + item_id: 00000012345678 (required, string) - order item id in form of a string
 
-The merge_variables object can gave up to 40 key-value pairs. 
-Keys must be at most 40 characters and values must be at most 500 characters.
-Neither can contain the characters " and \. Nested objects are not supported.
 
 + Request (application/json)
     + Headers
@@ -537,104 +543,17 @@ Neither can contain the characters " and \. Nested objects are not supported.
             Authorization: Basic ABC123
             
     + Body 
-    
-                {
-                    "order": {
-                      "currency": {
-                        "name": "US Dollars",
-                        "code": "USD",
-                        "symbol": "$",
-                        "decimal_places": 2
-                      },
-                      "coupons": [
-                        {
-                          "id": "1",
-                          "code": "abcde1",
-                          "display_name": "$5.00 off the order total",
-                          "coupon_type": "per_total_discount",
-                          "discounted_amount": 5
-                        }
-                      ],
-                      "discounts": [
-                        {
-                          "name": "Free Shipping",
-                          "discounted_amount": 7
-                        }
-                      ],
-                      "line_items": [
-                        {
-                          "physical_items": [
-                            {
-                              "id": "8235d47d-718b-4b9c-89a4-5fa1ee76a0b4",
-                              "variant_id": 182,
-                              "product_id": 118,
-                              "name": "BigCommerce Hoodies",
-                              "url": "http://your-store.mybigcommerce.com/hoodies/",
-                              "quantity": 2,
-                              "is_taxable": true,
-                              "image_url": "https://cdn8.bigcommerce.com/some-string/themes/ClassicNext/images/ProductDefault.gif",
-                              "discounts": [
-                                {
-                                  "name": "Free Shipping",
-                                  "discountedAmount": 7
-                                }
-                              ],
-                              "discount_amount": 0,
-                              "coupon_amount": 0,
-                              "list_price": 100,
-                              "sale_price": 100,
-                              "extended_list_price": 100,
-                              "extended_sale_price": 100,
-                              "type": "physical",
-                              "is_shipping_required": true
-                            }
-                          ],
-                          "digital_items": [
-                            {
-                              "quantity": 0,
-                              "discounts": [
-                                {
-                                  "name": "Free Shipping",
-                                  "discounted_amount": 7
-                                }
-                              ],
-                              "download_file_urls": []
-                            }
-                          ],
-                          "gift_certificate": [
-                            {
-                              "type": "giftCertificate"
-                            }
-                          ]
-                        }
-                      ],
-                      "billingAddress": {
-                        "country": "USA",
-                        "email": "janedoe@email.com",
-                        "firstName": "Jane",
-                        "lastName": "Doe",
-                        "company": "BigCommerce",
-                        "street1": "123 Main Street",
-                        "street2": "Apt 1",
-                        "city": "Austin",
-                        "countryCode": "USA",
-                        "postalCode": "12345",
-                        "customFields": [
-                          {}
-                        ]
-                      },
-                      "status": "INCOMPLETE"
-                    }
-                }
 
+            {
+                "status": "approved|rejected"
+            }
 
 + Response 200
 
-            {
-                "job_number": "000000987654321"
-            }
+        [][]
 
-
+    
+    
 + Response 404 (application/json)
 
         { 
